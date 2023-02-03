@@ -7,6 +7,9 @@ set -Eeo pipefail
 ### Comment this line to disable static binary ###
 STATIC_BUILD=1
 
+# Check os
+OS_TYPE=$(hostnamectl | grep -F "Operating System:")
+
 # Check for minisign
 if command -v minisign &> /dev/null; then
   echo "Minisign already installed, exiting:
@@ -35,6 +38,7 @@ if ! command -v cmake &> /dev/null || \
     - unzip
     - pkg-config
     - build-essential"
+    exit 1
   fi
 fi
 
