@@ -4,9 +4,8 @@
 #set -x
 set -Eeo pipefail
 
-# Get script dir
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
-OS_TYPE=$(hostnamectl | grep -F "Operating System:")
+### Comment this line to disable static binary ###
+STATIC_BUILD=1
 
 # Check for minisign
 if command -v minisign &> /dev/null; then
@@ -46,7 +45,7 @@ SODIUM_DIR="/tmp/libsodium-stable"
 SODIUM_LINK="https://download.libsodium.org/libsodium/releases/LATEST.tar.gz"
 wget "$SODIUM_LINK" -O "$SODIUM_TAR"
 rm -rf "$SODIUM_DIR"
-tar -xf "$SODIUM_TAR" -C $(dirname "$SODIUM_DIR")
+tar -xf "$SODIUM_TAR" -C "$(dirname "$SODIUM_DIR")"
 cd "$SODIUM_DIR" || exit 1
 # Build libsodium
 ./configure
@@ -59,11 +58,14 @@ MINI_DIR="/tmp/minisign-master"
 MINI_LINK="https://github.com/jedisct1/minisign/archive/refs/heads/master.zip"
 wget "$MINI_LINK" -O "$MINI_ZIP"
 rm -rf "$MINI_DIR"
-unzip "$MINI_ZIP" -d $(dirname "$MINI_DIR")
+unzip "$MINI_ZIP" -d "$(dirname "$MINI_DIR")"
 mkdir -p "$MINI_DIR/build"
 cd "$MINI_DIR/build" || exit 1
-# Static?
-cmake ..
+if [[ "$STATIC_BUILD" -eq 1 ]]; then
+  cmake -D BUILD_STATIC_EXECUTABLES=1 ..
+else
+  cmake ..
+fi
 make
 sudo make install
 
