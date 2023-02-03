@@ -75,6 +75,7 @@ sudo make install
 
 # Notify of completion
 echo "
-Done, minisign has been installed in: $(which minisign)
+--------------------------------------------------------------------------------
+Finished, minisign has been installed to: $(which minisign)
 Version:"
 minisign -v
