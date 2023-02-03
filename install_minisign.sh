@@ -42,12 +42,14 @@ if ! command -v cmake &> /dev/null || \
   fi
 fi
 
-# TODO: Add post-install verification of libsodium minisig?
 # Install libsodium
-SODIUM_TAR="/tmp/libsodium.tar.gz"
 SODIUM_DIR="/tmp/libsodium-stable"
+SODIUM_TAR="$SODIUM_DIR.tar.gz"
+SODIUM_SIG="$SODIUM_TAR.minisig"
 SODIUM_LINK="https://download.libsodium.org/libsodium/releases/LATEST.tar.gz"
+SODIUM_SIG_LINK="$SODIUM_LINK.minisig"
 wget "$SODIUM_LINK" -O "$SODIUM_TAR"
+wget "$SODIUM_SIG_LINK" -O "$SODIUM_SIG"
 rm -rf "$SODIUM_DIR"
 tar -xf "$SODIUM_TAR" -C "$(dirname "$SODIUM_DIR")"
 cd "$SODIUM_DIR" || exit 1
@@ -63,6 +65,7 @@ MINI_LINK="https://github.com/jedisct1/minisign/archive/refs/heads/master.zip"
 wget "$MINI_LINK" -O "$MINI_ZIP"
 rm -rf "$MINI_DIR"
 unzip "$MINI_ZIP" -d "$(dirname "$MINI_DIR")"
+rm -f "$MINI_ZIP"
 mkdir -p "$MINI_DIR/build"
 cd "$MINI_DIR/build" || exit 1
 if [[ "$STATIC_BUILD" -eq 1 ]]; then
@@ -79,3 +82,12 @@ echo "
 Finished, minisign has been installed to: $(which minisign)
 Version:"
 minisign -v
+echo "
+Testing minisign by verifying libsodium library downloaded for this install:
+"
+minisign -VP RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3 -m "$SODIUM_TAR"
+rm -f "$SODIUM_TAR"
+rm -f "$SODIUM_SIG"
+rm -rf "$SODIUM_DIR"
+rm -rf "$MINI_DIR"
+echo "--------------------------------------------------------------------------------"
