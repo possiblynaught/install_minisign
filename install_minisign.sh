@@ -17,7 +17,8 @@ if command -v minisign &> /dev/null; then
   echo "Minisign $(minisign -v | cut -d " " -f 2) already installed to $(which minisign)"
   exit
 elif (echo "$OS_TYPE" | grep -qF "Fedora"); then
-  sudo dnf install -y minisign
+  echo "Installing minisign via package manager..."
+  sudo dnf install -y minisign >/dev/null
   echo "Installed minisign $(minisign -v | cut -d " " -f 2) via package manager"
   exit
 else
@@ -30,10 +31,12 @@ if ! command -v cmake &> /dev/null || \
   ! command -v gcc &> /dev/null || \
   ! command -v unzip &> /dev/null; then
   if (echo "$OS_TYPE" | grep -qF "Fedora"); then
-    sudo dnf install -y build-essential cmake pkg-config unzip
+    echo "Installing build dependencies via dnf..."
+    sudo dnf install -y build-essential cmake pkg-config unzip >/dev/null
   elif (echo "$OS_TYPE" | grep -qF "Debian"); then
-    sudo apt update
-    sudo apt install -y build-essential cmake pkg-config unzip
+    echo "Installing build dependencies via apt..."
+    sudo apt-get update >/dev/null
+    sudo apt-get install -y build-essential cmake pkg-config unzip >/dev/null
   else
     echo "Error, please make sure the following packages are installed:
     - cmake
